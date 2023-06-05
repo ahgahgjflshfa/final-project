@@ -14,11 +14,11 @@
 */
 `timescale 1ns/1ns
 module EXMEMreg(clk, rst, 
-                RegWrite_IN, MemtoReg_IN, Shift_IN, Mf_IN,
+                RegWrite_IN, MemtoReg_IN, Shift_IN, Mf_IN, HiLoWrite_IN,
                 Branch_IN, MemWrite_IN, MemRead_IN, Jump_IN,
                 JumpAddress_IN, BranchAddress_IN, ShifterData_IN, Zero_IN, ALUData_IN, RD2_IN,
                 DataForHiLo_IN, HiLoData_IN, WN_IN,
-                RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT,
+                RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT, HiLoWrite_OUT,
                 Branch_OUT, MemWrite_OUT, MemReadOUT, Jump_OUT,
                 JumpAddress_OUT, BranchAddress_OUT, ShifterData_OUT, Zero_OUT, ALUData_OUT, RD2_OUT,
                 DataForHiLo_OUT, HiLoData_OUT, WN_OUT);
@@ -27,14 +27,14 @@ module EXMEMreg(clk, rst,
     input wire [63:0] DataForHiLo_IN;
     input wire [31:0] JumpAddress_IN, BranchAddress_IN, ShifterData_IN, ALUData_IN, RD2_IN, HiLoData_IN;
     input wire [4:0] WN_IN;
-    input wire RegWrite_IN, MemtoReg_IN, Shift_IN, Mf_IN,
+    input wire RegWrite_IN, MemtoReg_IN, Shift_IN, Mf_IN, HiLoWrite_IN,
                 Branch_IN, MemWrite_IN, MemRead_IN, Jump_IN,
                 Zero_IN;
 
     output reg [63:0] DataForHiLo_OUT;
     output reg [31:0] JumpAddress_OUT, BranchAddress_OUT, ShifterData_OUT, ALUData_OUT, RD2_OUT, HiLoData_OUT;
     output reg [4:0] WN_OUT;
-    output reg RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT,
+    output reg RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT, HiLoWrite_OUT,
                 Branch_OUT, MemWrite_OUT, MemReadOUT, Jump_OUT,
                 Zero_OUT;
 
@@ -57,6 +57,7 @@ module EXMEMreg(clk, rst,
             MemReadOUT <= 0;
             Jump_OUT <= 0;
             Zero_OUT <= 0;
+            HiLoWrite_OUT <= 0;
         end
         else begin
             DataForHiLo_OUT <= DataForHiLo_IN;
@@ -76,6 +77,7 @@ module EXMEMreg(clk, rst,
             MemReadOUT <= MemRead_IN;
             Jump_OUT <= Jump_IN;
             Zero_OUT <= Zero_IN;
+            HiLoWrite_OUT <= HiLoWrite_IN;
         end
     end
 endmodule
