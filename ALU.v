@@ -29,8 +29,8 @@ module ALU(ctl, a, b, cin, carry, result, zero);
     assign inv = ctl[2];
 
     assign c = (ctl == ALU_sub) ? 1'b1:  // sub
-               (ctl == ALU_slt) ? 1'b1:   // slt
-                                   cin;      // cin
+               (ctl == ALU_slt) ? 1'b1:  // slt
+                                   cin;  // cin
 
     One_bit_alu_slice aluslice0(.ctl(ctl), .a(a[0]), .b(b[0]), .invb(inv), .cin(c), .sum(sum[0]), .carry(cout[0]));
     One_bit_alu_slice aluslice1(.ctl(ctl), .a(a[1]), .b(b[1]), .invb(inv), .cin(cout[0]), .sum(sum[1]), .carry(cout[1]));

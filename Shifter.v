@@ -1,6 +1,5 @@
 `timescale 1ns/ 1ns
-module Shifter(Signal, a, shamt, result);
-    input [5:0] Signal;
+module Shifter(a, shamt, result);
     input wire [31:0] a;
     input wire [4:0] shamt;
     output [31:0] result;

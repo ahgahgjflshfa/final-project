@@ -22,7 +22,7 @@ module IDEXreg(clk, rst,
                 ALUSrc_IN, RegDst_IN, ALUOp_IN, funct_IN,
                 instr_index_IN, PCincre_IN, shamt_IN, RD1_IN, RD2_IN, ext_immed_IN, rt_IN, rd_IN, HiLoData_IN, HiLoConcat_IN, 
                 RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT,
-                Branch_OUT, MemWrite_OUT, MemReadOUT, Jump_OUT,
+                Branch_OUT, MemWrite_OUT, MemRead_OUT, Jump_OUT,
                 ALUSrc_OUT, RegDst_OUT, ALUOp_OUT, funct_OUT,
                 instr_index_OUT, PCincre_OUT, shamt_OUT, RD1_OUT, RD2_OUT, ext_immed_OUT, rt_OUT, rd_OUT, HiLoData_OUT, HiLoConcat_OUT);
 
@@ -44,7 +44,7 @@ module IDEXreg(clk, rst,
     output reg [4:0] shamt_OUT, rt_OUT, rd_OUT;
     output reg [1:0] ALUOp_OUT;
     output reg RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT,
-                Branch_OUT, MemWrite_OUT, MemReadOUT, Jump_OUT,
+                Branch_OUT, MemWrite_OUT, MemRead_OUT, Jump_OUT,
                 ALUSrc_OUT, RegDst_OUT;
 
     always @(posedge clk or rst) begin
@@ -56,7 +56,7 @@ module IDEXreg(clk, rst,
             Mf_OUT <= 0;
             Branch_OUT <= 0;
             MemWrite_OUT <= 0;
-            MemReadOUT <= 0;
+            MemRead_OUT <= 0;
             Jump_OUT <= 0;
             ALUSrc_OUT <= 0;
             RegDst_OUT <= 0;
@@ -80,7 +80,7 @@ module IDEXreg(clk, rst,
             Mf_OUT <= Mf_OUT;
             Branch_OUT <= Branch_IN;
             MemWrite_OUT <= MemWrite_IN;
-            MemReadOUT <= MemRead_IN;
+            MemRead_OUT <= MemRead_IN;
             Jump_OUT <= Jump_IN;
             ALUSrc_OUT <= ALUSrc_IN;
             RegDst_OUT <= RegDst_IN;

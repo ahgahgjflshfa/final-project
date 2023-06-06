@@ -12,17 +12,11 @@
 */
 `timescale 1ns/ 1ns
 module One_bit_alu_slice(ctl, a, b, invb, cin, sum, carry);
-    parameter AND = 6'b100100;
-    parameter OR  = 6'b100101;
-    parameter ADD = 6'b100000;
-    parameter SUB = 6'b100010;
-    parameter SLT = 6'b101010;
-
-    parameter SRL = 6'b000010;
-
-    parameter MULTU = 6'd25;
-    parameter MFHI = 6'b010000;
-    parameter MFLO = 6'b010010;
+    parameter ALU_add = 3'b010;
+    parameter ALU_sub = 3'b110;
+    parameter ALU_and = 3'b000;
+    parameter ALU_or  = 3'b001;
+    parameter ALU_slt = 3'b111;
 
     input [5:0] ctl;
     input a, b, invb, cin;
@@ -42,11 +36,10 @@ module One_bit_alu_slice(ctl, a, b, invb, cin, sum, carry);
 
     // assign sel
     wire [1:0] sel;
-    assign sel = (ctl == MULTU) ? 2'b10:   // multu
-                (ctl == AND) ? 2'b00:    // and
-                (ctl == OR) ? 2'b01:    // or
-                (ctl == ADD) ? 2'b10:    // add
-                            2'b10;      // sub and slt
+    assign sel = (ctl == ALU_and) ? 2'b00:    // and
+                 (ctl == ALU_or)  ? 2'b01:    // or
+                 (ctl == ALU_add) ? 2'b10:    // add
+                                    2'b10;      // sub and slt
 
     // select
     Mux_4to1 mux41(.sel(sel), .in0(temp0), .in1(temp1), .in2(temp2), .in3(0), .out(sum));

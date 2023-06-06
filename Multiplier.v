@@ -1,8 +1,7 @@
 `timescale 1ns/1ns
 
-module Multiplier(clk, reset, Signal, dataA, dataB, dataOut);
+module Multiplier(clk, Signal, dataA, dataB, dataOut);
     input clk;
-    input reset;
     input [5:0] Signal;
     input [31:0] dataA, dataB;
 
@@ -25,7 +24,7 @@ module Multiplier(clk, reset, Signal, dataA, dataB, dataOut);
         end
     end
 
-    always @ (posedge clk or reset) begin
+    always @ (posedge clk) begin
         if (multiplier[0] == 1'b1)
             product = product + multiplicand;
 

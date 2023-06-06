@@ -13,17 +13,17 @@
 `timescale 1ns/1ns
 module MEMWBreg(clk, rst,
                 RegWrite_IN, MemtoReg_IN, Shift_IN, Mf_IN, HiLoWrite_IN,
-                ShifterData_IN, MemData_IN, ALUData_IN, MULData_IN, HiLoData_IN, WN_IN,
+                ShifterData_IN, MemData_IN, ALUData_IN, DataForHiLo_IN, HiLoData_IN, WN_IN,
                 RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT, HiLoWrite_OUT,
-                ShifterData_OUT, MemData_OUT, ALUData_OUT, MULData_OUT, HiLoData_OUT, WN_OUT);
+                ShifterData_OUT, MemData_OUT, ALUData_OUT, DataForHiLo_OUT, HiLoData_OUT, WN_OUT);
 
     input wire clk, rst;
-    input wire [63:0] MULData_IN;
+    input wire [63:0] DataForHiLo_IN;
     input wire [31:0] ShifterData_IN, MemData_IN, ALUData_IN, HiLoData_IN;
     input wire [4:0] WN_IN;
     input wire Mf_IN, Shift_IN, MemtoReg_IN, RegWrite_IN, HiLoWrite_IN;
 
-    output reg [63:0] MULData_OUT;
+    output reg [63:0] DataForHiLo_OUT;
     output reg [31:0] ShifterData_OUT, MemData_OUT, ALUData_OUT, HiLoData_OUT;
     output reg [4:0] WN_OUT;
     output reg Mf_OUT, Shift_OUT, MemtoReg_OUT, RegWrite_OUT, HiLoWrite_OUT;
@@ -40,7 +40,7 @@ module MEMWBreg(clk, rst,
             MemtoReg_OUT <= 0;
             RegWrite_OUT <= 0;
             HiLoWrite_OUT <= 0;
-            MULData_OUT <= 0;
+            DataForHiLo_OUT <= 0;
         end
         else begin
             ShifterData_OUT <= ShifterData_IN;
@@ -53,7 +53,7 @@ module MEMWBreg(clk, rst,
             MemtoReg_OUT <= MemtoReg_IN;
             RegWrite_OUT <= RegWrite_IN;
             HiLoWrite_OUT <= HiLoWrite_IN;
-            MULData_OUT <= MULData_IN;
+            DataForHiLo_OUT <= DataForHiLo_IN;
         end
     end
 endmodule
