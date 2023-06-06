@@ -2,10 +2,6 @@
 module PipelineMIPS(clk, rst);
     input wire clk, rst;
 
-    // break out important fields from instruction
-
-    // datapath signals
-
 // IF
     wire [31:0] pc, pc_incr_IF, instr_IF;
 

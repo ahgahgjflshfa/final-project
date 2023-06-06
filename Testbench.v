@@ -1,104 +1,54 @@
-`timescale 1ns/ 1ns
-module tb_ALU();
+/*
+	Title: MIPS Single Cycle CPU Testbench
+	Author: Selene (Computer System and Architecture Lab, ICE, CYCU) 
+*/
+module tb_SingleCycle();
 	reg clk, rst;
-	reg [5:0] ctrl;
-	reg [31:0] inputA, inputB, ans;
-	wire [31:0] out;
-	integer fp_r, fp_r_ans, eof;
 	
 	// 產生時脈，週期：10ns
 	initial begin
-		clk = 1'b1;
+		clk = 1;
 		forever #5 clk = ~clk;
 	end
-	
+
 	initial begin
-		eof = 0;
 		rst = 1'b1;
+		/*
+			指令資料記憶體，檔名"instr_mem.txt, data_mem.txt"可自行修改
+			每一行為1 Byte資料，以兩個十六進位數字表示
+			且為Little Endian編碼
+		*/
+		$readmemh("instr_mem.txt", CPU.InstrMem.mem_array );
+		$readmemh("data_mem.txt", CPU.DatMem.mem_array );
+		// 設定暫存器初始值，每一行為一筆暫存器資料
+		$readmemh("reg.txt", CPU.RegFile.file_array );
 		#10;
 		rst = 1'b0;
-		/*
-			讀取輸入指令，檔名"input.txt"可自行修改
-			每一行為一筆輸入
-			格式為：控制訊號  InputA  InputB
-		*/
-		fp_r = $fopen( "./input.txt", "r" );
-		/*
-			讀取答案，檔名"ans.txt"可自行修改
-			每一行為一筆正確答案
-		*/
-		fp_r_ans = $fopen( "./ans.txt", "r" );
-		/*
-			自此開始模擬ALU並比對輸出結果
-			如結果正確，將輸出："Correct"
-			不正確將輸出執行結果與正確答案
-			以上輸出的第一個數字為cycle number
-		*/
-		$display( "Start\n" );
-		eof = $fscanf(fp_r_ans, "%d", ans);
-		while( eof != -1 ) begin
-			$fscanf(fp_r, "%d%d%d", ctrl, inputA, inputB );
-			$write( "%d: Input: ", $time/10 );
-			if ( ctrl == 6'd36 ) $write( "AND(%d)", ctrl );
-			else if ( ctrl == 6'd37 ) $write( "OR(%d) ", ctrl );
-			else if ( ctrl == 6'd32 ) $write( "ADD(%d) ", ctrl );
-			else if ( ctrl == 6'd34 ) $write( "SUB(%d) ", ctrl );
-			else if ( ctrl == 6'd42 ) $write( "SLT(%d) ", ctrl );
-			else if ( ctrl == 6'd02 ) $write( "SRL(%d) ", ctrl );
-			else if ( ctrl == 6'd25 ) $write( "MULTU(%d) ", ctrl );
-			$display( "%d%d", inputA, inputB  );
-			if ( ctrl == 32'd25 ) begin // 乘法
-				#330;
-				$display( "%d: Mul End\n", $time/10 );
-				/*
-					除法器執行結束後，答案存至Hi-Lo暫存器
-					以下自動產生MFHI, MFLO指令檢查除法運算結果
-				*/
-				#10;
-				#10;
-				
-				$display( "                   Move Hi" );
-				ctrl = 6'd16; // MFHI
-				#10;
-				if ( ans == out )
-					$display( "%d: Correct: Your answer is:%d,\n                                 Correct answer is:%d\n", $time/10, out, ans );
-				else
-					$display( "%d: Wrong Answer: Your answer is:%d,\n                                             Correct answer is:%d\n", $time/10, out, ans );
-				$display( "                   Move Lo" );
-				ctrl = 6'd18; // MFLO
-				eof = $fscanf(fp_r_ans, "%d", ans);
-				#10;
-				if ( ans == out )
-					$display( "%d: Correct: Your answer is:%d,\n                                 Correct answer is:%d\n", $time/10, out, ans );
-				else
-					$display( "%d: Wrong Answer: Your answer is:%d,\n                                             Correct answer is:%d\n", $time/10, out, ans );
-			end
-			else begin
-				#10;
-				if ( ans == out )
-					$display( "%d: Correct: Your answer is:%d,\n                                 Correct answer is:%d\n", $time/10, out, ans );
-				else
-					$display( "%d: Wrong Answer: Your answer is:%d,\n                                             Correct answer is:%d\n", $time/10, out, ans );
-			end
-			eof = $fscanf(fp_r_ans, "%d", ans);
-		end
-		$fclose( fp_r );
-		$fclose( fp_r_ans );
-		$display( "Simulation End\n" );
-		$stop();
 	end
-
-	TotalALU alu( .clk(clk), .reset(rst), .dataA(inputA), 
-				  .dataB(inputB), .Signal(ctrl), .Output(out) );
-
-endmodule 
-
-/*
-	AND  : 36
-	OR   : 37
-	ADD  : 32
-	SUB  : 34
-	SLT  : 42
-	SRL  : 02
-	MULTU : 25
-*/
+	
+	always @( posedge clk ) begin
+		$display( "%d, PC:", $time/10-1, CPU.pc );
+		if ( CPU.opcode == 6'd0 ) begin
+			$display( "%d, wd: %d", $time/10-1, CPU.rfile_wd );
+			if ( CPU.funct == 6'd32 ) $display( "%d, ADD\n", $time/10-1 );
+			else if ( CPU.funct == 6'd34 ) $display( "%d, SUB\n", $time/10-1 );
+			else if ( CPU.funct == 6'd36 ) $display( "%d, AND\n", $time/10-1 );
+			else if ( CPU.funct == 6'd37 ) $display( "%d, OR\n", $time/10-1 );
+			else if ( CPU.funct == 6'b101010 ) $display( "%d, SLT\n", $time/10-1 );
+			else if ( CPU.funct == 6'b000010 ) $display( "%d, SRL\n", $time/10-1 );
+			else if ( CPU.funct == 6'b011001 ) $display( "%d, MULTU\n", $time/10-1 );
+			else if ( CPU.funct == 6'b010000 ) $display( "%d, MFHI\n", $time/10-1 );
+			else if ( CPU.funct == 6'b010010 ) $display( "%d, MFLO\n", $time/10-1 );
+			else if ( CPU.funct == 6'b000000 ) $display( "%d, NOP\n", $time/10-1 );
+		end
+		else if ( CPU.op == 6'b011100 ) $display( "%d, MADDU\n", $time/10-1 );
+		else if ( CPU.op == 6'd35 ) $display( "%d, LW\n", $time/10-1 );
+		else if ( CPU.op == 6'd43 ) $display( "%d, SW\n", $time/10-1 );
+		else if ( CPU.op == 6'd4 ) $display( "%d, BEQ\n", $time/10-1 );
+		else if ( CPU.op == 6'd2 ) $display( "%d, J\n", $time/10-1 );
+		else if ( CPU.op == 6'b001001 ) $display( "%d, ADDIU\n", $time/10-1 );
+	end
+	
+	PipelineMIPS CPU( clk, rst );
+	
+endmodule
