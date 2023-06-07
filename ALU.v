@@ -8,29 +8,36 @@
 		1. result: 最後處理完的結果
 		2. zero:   branch指令所需要之輸出
 */
-
 `timescale 1ns/ 1ns
 module ALU(ctl, a, b, cin, carry, result, zero);
-    // symbolic constants for ALU Operations
-    parameter ALU_add = 3'b010;
-    parameter ALU_sub = 3'b110;
-    parameter ALU_and = 3'b000;
-    parameter ALU_or  = 3'b001;
-    parameter ALU_slt = 3'b111;
+    parameter AND = 6'b100100;
+    parameter OR  = 6'b100101;
+    parameter ADD = 6'b100000;
+    parameter SUB = 6'b100010;
+    parameter SLT = 6'b101010;
+
+    parameter SRL = 6'b000010;
+
+    parameter MULTU = 6'd25;
+    parameter MFHI = 6'b010000;
+    parameter MFLO = 6'b010010;
 
     input cin;
-    input [2:0] ctl;
+    input [5:0] ctl;
     input [31:0] a, b;
     output wire [31:0] result;
     output carry, zero;
 
-    wire [31:0] sum, cout;
     wire inv, c;
-    assign inv = ctl[2];
+    assign inv = (ctl == SUB) ? 1'b1:   // sub
+                 (ctl == SLT) ? 1'b1:   // slt
+                               1'b0;   // other
 
-    assign c = (ctl == ALU_sub) ? 1'b1:  // sub
-               (ctl == ALU_slt) ? 1'b1:  // slt
-                                   cin;  // cin
+    assign c = (ctl == SUB) ? 1'b1:  // sub
+                (ctl == SLT) ? 1'b1:   // slt
+                            cin;      // cin
+
+    wire [31:0] sum, cout;
 
     One_bit_alu_slice aluslice0(.ctl(ctl), .a(a[0]), .b(b[0]), .invb(inv), .cin(c), .sum(sum[0]), .carry(cout[0]));
     One_bit_alu_slice aluslice1(.ctl(ctl), .a(a[1]), .b(b[1]), .invb(inv), .cin(cout[0]), .sum(sum[1]), .carry(cout[1]));
@@ -65,10 +72,10 @@ module ALU(ctl, a, b, cin, carry, result, zero);
     One_bit_alu_slice aluslice30(.ctl(ctl), .a(a[30]), .b(b[30]), .invb(inv), .cin(cout[29]), .sum(sum[30]), .carry(cout[30]));
     One_bit_alu_slice aluslice31(.ctl(ctl), .a(a[31]), .b(b[31]), .invb(inv), .cin(cout[30]), .sum(sum[31]), .carry(cout[31]));
 
-    assign result = (ctl == ALU_slt) ? {31'b0, sum[31]}: // slt
+    assign result = (ctl == SLT) ? {31'b0, sum[31]}: // slt
                                   sum;              // other
 
-    assign carry = (ctl == ALU_slt) ? 1'b0:
+    assign carry = (ctl == SLT) ? 1'b0:
                                 cout[31];
 
     assign zero = (sum == 32'b0) ? 1 : 0;

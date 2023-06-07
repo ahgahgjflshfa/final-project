@@ -46,11 +46,12 @@
 
 */
 `timescale 1ns/ 1ns
-module Control_Unit(opcode, funct,
+module Control_Unit(clk, rst, opcode, funct,
                    RegWrite, MemtoReg, Shift, Mf,
                    Branch, MemWrite, MemRead, Jump,
                    ALUSrc, HiorLo, RegDst, ALUOp);
 
+    input wire clk, rst;
     input wire [5:0] opcode, funct;
     output reg RegWrite, MemtoReg, Shift, Mf,
                Branch, MemWrite, MemRead, Jump,

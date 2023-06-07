@@ -1,14 +1,14 @@
 /*
-	Title: MIPS Single Cycle CPU Testbench
-	Author: Selene (Computer System and Architecture Lab, ICE, CYCU) 
+	Title: MIPS Pipeline CPU Testbench 
 */
-module tb_SingleCycle();
+`timescale 1ns/1ns
+module tb_Pipeline();
 	reg clk, rst;
 	
 	// 產生時脈，週期：10ns
 	initial begin
 		clk = 1;
-		forever #5 clk = ~clk;
+		forever #10 clk = ~clk;
 	end
 
 	initial begin
@@ -19,17 +19,21 @@ module tb_SingleCycle();
 			且為Little Endian編碼
 		*/
 		$readmemh("instr_mem.txt", CPU.InstrMem.mem_array );
-		$readmemh("data_mem.txt", CPU.DatMem.mem_array );
+		$readmemh("data_mem.txt", CPU.DataMem.mem_array );
 		// 設定暫存器初始值，每一行為一筆暫存器資料
 		$readmemh("reg.txt", CPU.RegFile.file_array );
-		#10;
+		#20
 		rst = 1'b0;
+
+		#200
+		$stop;
 	end
 	
 	always @( posedge clk ) begin
+		
 		$display( "%d, PC:", $time/10-1, CPU.pc );
-		if ( CPU.opcode == 6'd0 ) begin
-			$display( "%d, wd: %d", $time/10-1, CPU.rfile_wd );
+		if ( CPU.op == 6'd0 ) begin
+			$display( "%d, wd: %d", $time/10-1, CPU.WD );
 			if ( CPU.funct == 6'd32 ) $display( "%d, ADD\n", $time/10-1 );
 			else if ( CPU.funct == 6'd34 ) $display( "%d, SUB\n", $time/10-1 );
 			else if ( CPU.funct == 6'd36 ) $display( "%d, AND\n", $time/10-1 );

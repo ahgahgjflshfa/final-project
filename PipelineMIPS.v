@@ -11,9 +11,10 @@ module PipelineMIPS(clk, rst);
     wire [15:0] immed;
     wire [5:0] op, funct_ID;
     wire [4:0] rs, rt_ID, rd_ID, shamt_ID;
+    wire [1:0] ALUOp_ID;
     wire Mf_ID, Shift_ID, MemtoReg_ID, RegWrite_ID;     // w
     wire Branch_ID, MemWrite_ID, MemRead_ID, Jump_ID;   // m
-    wire ALUOp_ID, ALUSrc_ID, HiorLo, RegDst_ID;     // e
+    wire ALUSrc_ID, HiorLo, RegDst_ID;     // e
 
 // EX
     wire [31:0] pc_incr_EX, RD1, RD2_EX, extend_immed, j_address_EX, b_address_EX;
@@ -26,11 +27,12 @@ module PipelineMIPS(clk, rst);
     wire [5:0] SignaltoMUL;
     wire [4:0] WN_EX;
     wire [2:0] SignaltoALU;
+    wire [1:0] ALUOp;
     wire Maddu, HiLoWrite_EX, Zero_EX;
 
     wire Mf_EX, Shift_EX, MemtoReg_EX, RegWrite_EX;
     wire Branch_EX, MemWrite_EX, MemRead_EX, Jump_EX;
-    wire ALUOp, ALUSrc, RegDst;
+    wire ALUSrc, RegDst;
 
 // MEM
     wire [63:0] DataForHiLo_MEM;
@@ -46,7 +48,7 @@ module PipelineMIPS(clk, rst);
 
 // WB
     wire [63:0] DataForHiLo;
-    wire [31:0] ShifterOut, MemOut, ALUOut, DataForHilo, HiLoData;
+    wire [31:0] ShifterOut, MemOut, ALUOut, HiLoData;
     wire [4:0] WN;
     wire HiLoWrite;
 
@@ -64,7 +66,7 @@ module PipelineMIPS(clk, rst);
     memory InstrMem( .clk(clk), .MemRead(1'b1), .MemWrite(1'b0), .wd(32'd0), .addr(pc), .rd(instr_IF) );
 
 // IF/ID pipeline reg
-    IFIDreg ifid(.clk(clk), .rst(rst), .PCincre_IN(pc_incr_IF),.instrIN(instr_IF), .PCincreOUT(pc_incr_ID), .instrOUT(instr_ID));
+    IFIDreg ifid(.clk(clk), .rst(rst), .PCincre_IN(pc_incr_IF),.instr_IN(instr_IF), .PCincre_OUT(pc_incr_ID), .instr_OUT(instr_ID));
 
 // ID
     assign op = instr_ID[31:26];
@@ -112,7 +114,7 @@ module PipelineMIPS(clk, rst);
 
     Mux2_32bit alusrcMUX(.sel(ALUSrc), .in0(RD2_EX), .in1(extend_immed), .out(ALU_Input2));
 
-    ALU alu(.ctl(SignaltoALU), .a(RD1), .b(ALU_Input2), .cin(0), .carry(), .result(ALUOut), .zero(Zero_EX));
+    ALU alu(.ctl(SignaltoALU), .a(RD1), .b(ALU_Input2), .cin(1'b0), .carry(), .result(ALUOut_EX), .zero(Zero_EX));
 
     add64 madduADD(.a(MULOut), .b(HiLoConcat), .result(MadduOut));
 
@@ -125,7 +127,7 @@ module PipelineMIPS(clk, rst);
                 .Mf_IN(Mf_EX), .HiLoWrite_IN(HiLoWrite_EX), .Branch_IN(Branch_EX), .MemWrite_IN(MemWrite_EX),
                 .MemRead_IN(MemRead_EX), .Jump_IN(Jump_EX), .JumpAddress_IN(j_address_EX), 
                 .BranchAddress_IN(b_address_EX), .ShifterData_IN(ShifterOut_EX), .Zero_IN(Zero_EX),
-                .ALUData_IN(ALUOut_EX), .RD2_IN(RD2_EX), .DataForHilo_IN(DataForHiLo_EX), .HiLoData_IN(HiLoData_EX),
+                .ALUData_IN(ALUOut_EX), .RD2_IN(RD2_EX), .DataForHiLo_IN(DataForHiLo_EX), .HiLoData_IN(HiLoData_EX),
                 .WN_IN(WN_EX), .RegWrite_OUT(RegWrite_MEM), .MemtoReg_OUT(MemtoReg_MEM), .Shift_OUT(Shift_MEM),
                 .Mf_OUT(Mf_MEM), .HiLoWrite_OUT(HiLoWrite_MEM), .Branch_OUT(Branch), .MemWrite_OUT(MemWrite),
                 .MemRead_OUT(MemRead), .Jump_OUT(Jump), .JumpAddress_OUT(j_address_MEM), 
@@ -136,16 +138,16 @@ module PipelineMIPS(clk, rst);
 // MEM
     and BranchAND(PCSrc, Branch, Zero);
 
-    memory DataMemory(.clk(clk), .MemRead(MemRead), .MemWrite(MemWrite), .wd(RD2), .addr(ALUOut_MEM));
+    memory DataMem(.clk(clk), .MemRead(MemRead), .MemWrite(MemWrite), .wd(RD2), .addr(ALUOut_MEM), .rd(MemOut_MEM));
 
     Mux2_32bit BranchMUX(.sel(PCSrc), .in0(pc_incr_IF), .in1(b_address_MEM), .out(pc_next1));
 
     Mux2_32bit JumpMUX(.sel(Jump), .in0(pc_next1), .in1(j_address_MEM), .out(pc_next));
 
 // MEM/WB pipeline reg
-     MEMWBreg memwb(.clk(clk), .rst(rst), .RegWrite_IN(RegWrite_MEM), .MemtoReg(MemtoReg_MEM), .Shift_IN(Shift_MEM), .Mf_IN(Mf_MEM),
+    MEMWBreg memwb(.clk(clk), .rst(rst), .RegWrite_IN(RegWrite_MEM), .MemtoReg_IN(MemtoReg_MEM), .Shift_IN(Shift_MEM), .Mf_IN(Mf_MEM),
                     .HiLoWrite_IN(HiLoWrite_MEM), .ShifterData_IN(ShifterOut_MEM), .MemData_IN(MemOut_MEM), .ALUData_IN(ALUOut_MEM),
-                    .DataForHilo_IN(DataForHiLo_MEM), .HiLoData_IN(HiLoData_MEM), .WN_IN(WN_MEM), .RegWrite_OUT(RegWrite_MEM),
+                    .DataForHiLo_IN(DataForHiLo_MEM), .HiLoData_IN(HiLoData_MEM), .WN_IN(WN_MEM), .RegWrite_OUT(RegWrite_MEM),
                     .MemtoReg_OUT(MemtoReg), .Shift_OUT(Shift), .Mf_OUT(Mf), .HiLoWrite_OUT(HiLoWrite), .ShifterData_OUT(ShifterOut),
                     .MemData_OUT(MemOut), .ALUData_OUT(ALUOut), .DataForHiLo_OUT(DataForHilo), .HiLoData_OUT(HiLoData), .WN_OUT(WN));
 

@@ -44,7 +44,7 @@ module ALUControl( clk, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite );
     input clk ;
     input wire [5:0] funct ;
     output wire [5:0] SignaltoMUL;
-    output reg [2:0] SignaltoALU;
+    output wire [5:0] SignaltoALU;
     output reg Maddu, HiLoWrite;
 
     reg [5:0] temp ;
@@ -97,19 +97,9 @@ module ALUControl( clk, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite );
         end
         else
             counter = 0 ;
-
-        case (funct)
-            AND: SignaltoALU = ALU_and;
-            OR: SignaltoALU = ALU_or;
-            ADD: SignaltoALU = ALU_add;
-            SUB: SignaltoALU = ALU_sub;
-            SLT: SignaltoALU = ALU_slt;
-            default begin
-                SignaltoALU = ALU_and;
-            end
-        endcase
     end
 
+    assign SignaltoALU = temp ;
     assign SignaltoMUL = temp ;
 
 endmodule

@@ -19,7 +19,7 @@ module EXMEMreg(clk, rst,
                 JumpAddress_IN, BranchAddress_IN, ShifterData_IN, Zero_IN, ALUData_IN, RD2_IN,
                 DataForHiLo_IN, HiLoData_IN, WN_IN,
                 RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT, HiLoWrite_OUT,
-                Branch_OUT, MemWrite_OUT, MemReadOUT, Jump_OUT,
+                Branch_OUT, MemWrite_OUT, MemRead_OUT, Jump_OUT,
                 JumpAddress_OUT, BranchAddress_OUT, ShifterData_OUT, Zero_OUT, ALUData_OUT, RD2_OUT,
                 DataForHiLo_OUT, HiLoData_OUT, WN_OUT);
 
@@ -35,7 +35,7 @@ module EXMEMreg(clk, rst,
     output reg [31:0] JumpAddress_OUT, BranchAddress_OUT, ShifterData_OUT, ALUData_OUT, RD2_OUT, HiLoData_OUT;
     output reg [4:0] WN_OUT;
     output reg RegWrite_OUT, MemtoReg_OUT, Shift_OUT, Mf_OUT, HiLoWrite_OUT,
-                Branch_OUT, MemWrite_OUT, MemReadOUT, Jump_OUT,
+                Branch_OUT, MemWrite_OUT, MemRead_OUT, Jump_OUT,
                 Zero_OUT;
 
     always @(posedge clk or rst) begin
@@ -54,7 +54,7 @@ module EXMEMreg(clk, rst,
             Mf_OUT <= 0;
             Branch_OUT <= 0;
             MemWrite_OUT <= 0;
-            MemReadOUT <= 0;
+            MemRead_OUT <= 0;
             Jump_OUT <= 0;
             Zero_OUT <= 0;
             HiLoWrite_OUT <= 0;
@@ -74,7 +74,7 @@ module EXMEMreg(clk, rst,
             Mf_OUT <= Mf_OUT;
             Branch_OUT <= Branch_IN;
             MemWrite_OUT <= MemWrite_IN;
-            MemReadOUT <= MemRead_IN;
+            MemRead_OUT <= MemRead_IN;
             Jump_OUT <= Jump_IN;
             Zero_OUT <= Zero_IN;
             HiLoWrite_OUT <= HiLoWrite_IN;
