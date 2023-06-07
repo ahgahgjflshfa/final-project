@@ -34,8 +34,8 @@ module ALU(ctl, a, b, cin, carry, result, zero);
                                1'b0;   // other
 
     assign c = (ctl == SUB) ? 1'b1:  // sub
-                (ctl == SLT) ? 1'b1:   // slt
-                            cin;      // cin
+               (ctl == SLT) ? 1'b1:   // slt
+                               cin;      // cin
 
     wire [31:0] sum, cout;
 

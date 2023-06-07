@@ -24,9 +24,8 @@ module PipelineMIPS(clk, rst);
     
     wire [63:0] HiLoConcat, MadduOut, MULOut, DataForHiLo_EX;
     wire [31:0] ALUOut_EX, ShifterOut_EX, HiLoData_EX, ALU_Input2;
-    wire [5:0] SignaltoMUL;
+    wire [5:0] SignaltoMUL, SignaltoALU;
     wire [4:0] WN_EX;
-    wire [2:0] SignaltoALU;
     wire [1:0] ALUOp;
     wire Maddu, HiLoWrite_EX, Zero_EX;
 

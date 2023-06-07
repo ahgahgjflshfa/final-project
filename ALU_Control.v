@@ -72,7 +72,7 @@ module ALUControl( clk, rst, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite )
     parameter ALU_or  = 3'b001;
     parameter ALU_slt = 3'b111;
 
-    always @( posedge clk or rst ) begin
+    always @( posedge clk or rst or funct ) begin
         temp = funct ;
 
         if (rst == 1) begin

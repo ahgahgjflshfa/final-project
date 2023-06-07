@@ -80,99 +80,97 @@ module Control_Unit(clk, rst, opcode, funct,
     parameter MFLO = 6'b010010;
     parameter MULTU = 6'b011001;
 
-    parameter NOP = 6'b0;
+    parameter NOP = 6'b000000;
 
-    always @(posedge clk or rst) begin
+    always @(posedge clk or rst or funct or opcode) begin
         if (rst == 1) begin
             RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b00; HiorLo = 1'b0;
             Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
             Shift = 1'b0; Mf = 1'b0;
         end
-    end
-
-    always @(opcode or funct) begin
-        case (opcode)
-            R_FORMAT : 
-            begin
-				case (funct)
-                    SRL:
-                    begin
-                        RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
-                        Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
-                        Shift = 1'b1; Mf = 1'b0;
-                    end
-                    MULTU:
-                    begin
-                        RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
-                        Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
-                        Shift = 1'b0; Mf = 1'b0;
-                    end
-                    MFHI:
-                    begin
-                        RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b1;
-                        Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
-                        Shift = 1'b0; Mf = 1'b1;
-                    end
-                    MFLO:
-                    begin
-                        RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
-                        Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
-                        Shift = 1'b0; Mf = 1'b1;
-                    end
-                    NOP:
-                    begin
-                        
-                    end
-                    default begin   // ADD SUB AND OR SLT
-                        RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b10; HiorLo = 1'b0;
-                        Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
-                        Shift = 1'b0; Mf = 1'b0;
-                    end
-                endcase
-            end
-            ADDIU:
-            begin
-                RegDst = 1'b1; ALUSrc = 1'b1; ALUOp = 2'b00; HiorLo = 1'b0;
-                Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
-                Shift = 1'b0; Mf = 1'b0;
-            end
-            MADDU:
-            begin
-                RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
-                Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
-                Shift = 1'b0; Mf = 1'b0;
-            end
-            LW :
-            begin
-                RegDst = 1'b1; ALUSrc = 1'b1; ALUOp = 2'b00; HiorLo = 1'b0;
-                Branch = 1'b0; Jump = 1'b0; MemRead = 1'b1; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b1;
-                Shift = 1'b0; Mf = 1'b0;
-            end
-            SW :
-            begin
-                RegDst = 1'b0; ALUSrc = 1'b1; ALUOp = 2'b00; HiorLo = 1'b0;
-                Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b1; RegWrite = 1'b0; MemtoReg = 1'b0;
-                Shift = 1'b0; Mf = 1'b0;
-            end
-            BEQ :
-            begin
-                RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
-                Branch = 1'b1; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
-                Shift = 1'b0; Mf = 1'b0;
-            end
-            J :
-            begin
-                RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b00; HiorLo = 1'b0;
-                Branch = 1'b0; Jump = 1'b1; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
-                Shift = 1'b0; Mf = 1'b0;
-            end
-            default begin
-                $display("control_single unimplemented opcode %d", opcode);
-				RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b00; HiorLo = 1'b0;
-                Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
-                Shift = 1'b0; Mf = 1'b0;
-            end
-        endcase
+        else begin
+            case (opcode)
+                R_FORMAT : 
+                begin
+                    case (funct)
+                        SRL:
+                        begin
+                            RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
+                            Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
+                            Shift = 1'b1; Mf = 1'b0;
+                        end
+                        MULTU:
+                        begin
+                            RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
+                            Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
+                            Shift = 1'b0; Mf = 1'b0;
+                        end
+                        MFHI:
+                        begin
+                            RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b1;
+                            Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
+                            Shift = 1'b0; Mf = 1'b1;
+                        end
+                        MFLO:
+                        begin
+                            RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
+                            Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
+                            Shift = 1'b0; Mf = 1'b1;
+                        end
+                        NOP:
+                        begin
+                        end
+                        default begin   // ADD SUB AND OR SLT
+                            RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b10; HiorLo = 1'b0;
+                            Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
+                            Shift = 1'b0; Mf = 1'b0;
+                        end
+                    endcase
+                end
+                ADDIU:
+                begin
+                    RegDst = 1'b1; ALUSrc = 1'b1; ALUOp = 2'b00; HiorLo = 1'b0;
+                    Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b0;
+                    Shift = 1'b0; Mf = 1'b0;
+                end
+                MADDU:
+                begin
+                    RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
+                    Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
+                    Shift = 1'b0; Mf = 1'b0;
+                end
+                LW :
+                begin
+                    RegDst = 1'b1; ALUSrc = 1'b1; ALUOp = 2'b00; HiorLo = 1'b0;
+                    Branch = 1'b0; Jump = 1'b0; MemRead = 1'b1; MemWrite = 1'b0; RegWrite = 1'b1; MemtoReg = 1'b1;
+                    Shift = 1'b0; Mf = 1'b0;
+                end
+                SW :
+                begin
+                    RegDst = 1'b0; ALUSrc = 1'b1; ALUOp = 2'b00; HiorLo = 1'b0;
+                    Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b1; RegWrite = 1'b0; MemtoReg = 1'b0;
+                    Shift = 1'b0; Mf = 1'b0;
+                end
+                BEQ :
+                begin
+                    RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b01; HiorLo = 1'b0;
+                    Branch = 1'b1; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
+                    Shift = 1'b0; Mf = 1'b0;
+                end
+                J :
+                begin
+                    RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b00; HiorLo = 1'b0;
+                    Branch = 1'b0; Jump = 1'b1; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
+                    Shift = 1'b0; Mf = 1'b0;
+                end
+                default begin
+                    $display("control_single unimplemented opcode %d", opcode);
+                    RegDst = 1'b1; ALUSrc = 1'b1; ALUOp = 2'b01; HiorLo = 1'b1;
+                    Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b1;
+                    Shift = 1'b1; Mf = 1'b1;
+                end
+            endcase
+        end
     end
     
 
