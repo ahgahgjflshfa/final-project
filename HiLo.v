@@ -7,10 +7,10 @@ module HiLo(clk, rst, en_reg, data_in, HiOut, LoOut);
     reg [63:0] HiLo; 
 
     always @(posedge clk or rst)
-        if (rst)
+        if (rst == 1)
             HiLo <= 64'b0;
         
-        else if (en_reg)
+        else if (en_reg == 1)
             HiLo <= data_in;
     
     assign HiOut = HiLo[63:32];

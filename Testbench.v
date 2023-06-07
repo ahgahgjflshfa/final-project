@@ -8,10 +8,12 @@ module tb_Pipeline();
 	// 產生時脈，週期：10ns
 	initial begin
 		clk = 1;
-		forever #10 clk = ~clk;
+		forever #5 clk = ~clk;
 	end
 
 	initial begin
+		rst = 1'b0;
+		#10
 		rst = 1'b1;
 		/*
 			指令資料記憶體，檔名"instr_mem.txt, data_mem.txt"可自行修改
@@ -22,15 +24,15 @@ module tb_Pipeline();
 		$readmemh("data_mem.txt", CPU.DataMem.mem_array );
 		// 設定暫存器初始值，每一行為一筆暫存器資料
 		$readmemh("reg.txt", CPU.RegFile.file_array );
-		#20
+		#10
 		rst = 1'b0;
 
-		#200
+		#100
 		$stop;
 	end
 	
 	always @( posedge clk ) begin
-		
+		#20
 		$display( "%d, PC:", $time/10-1, CPU.pc );
 		if ( CPU.op == 6'd0 ) begin
 			$display( "%d, wd: %d", $time/10-1, CPU.WD );

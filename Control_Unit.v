@@ -82,6 +82,14 @@ module Control_Unit(clk, rst, opcode, funct,
 
     parameter NOP = 6'b0;
 
+    always @(posedge clk or rst) begin
+        if (rst == 1) begin
+            RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b00; HiorLo = 1'b0;
+            Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
+            Shift = 1'b0; Mf = 1'b0;
+        end
+    end
+
     always @(opcode or funct) begin
         case (opcode)
             R_FORMAT : 
@@ -160,8 +168,9 @@ module Control_Unit(clk, rst, opcode, funct,
             end
             default begin
                 $display("control_single unimplemented opcode %d", opcode);
-				RegDst=1'bx; ALUSrc=1'bx; MemtoReg=1'bx; RegWrite=1'bx; MemRead=1'bx; 
-				MemWrite=1'bx; Branch=1'bx; Jump = 1'bx; ALUOp = 2'bxx;
+				RegDst = 1'b0; ALUSrc = 1'b0; ALUOp = 2'b00; HiorLo = 1'b0;
+                Branch = 1'b0; Jump = 1'b0; MemRead = 1'b0; MemWrite = 1'b0; RegWrite = 1'b0; MemtoReg = 1'b0;
+                Shift = 1'b0; Mf = 1'b0;
             end
         endcase
     end

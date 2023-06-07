@@ -39,7 +39,7 @@ module EXMEMreg(clk, rst,
                 Zero_OUT;
 
     always @(posedge clk or rst) begin
-        if (rst) begin
+        if (rst == 1) begin
             DataForHiLo_OUT <= 0;
             JumpAddress_OUT <= 0;
             BranchAddress_OUT <= 0;
@@ -62,7 +62,7 @@ module EXMEMreg(clk, rst,
         else begin
             DataForHiLo_OUT <= DataForHiLo_IN;
             JumpAddress_OUT <= JumpAddress_IN;
-            BranchAddress_OUT <= Branch_IN;
+            BranchAddress_OUT <= BranchAddress_IN;
             ShifterData_OUT <= ShifterData_IN;
             ALUData_OUT <= ALUData_IN;
             RD2_OUT <= RD2_IN;

@@ -76,10 +76,11 @@ module PipelineMIPS(clk, rst);
     assign rt_ID = instr_ID[20:16];
     assign rd_ID = instr_ID[15:11];
     assign immed = instr_ID[15:0];
+    assign j_offset_ID = instr_ID[25:0];
 
     reg_file RegFile(.clk(clk), .RegWrite(RegWrite), .RN1(rs), .RN2(rt_ID), .WN(WN), .WD(WD), .RD1(RD1_ID), .RD2(RD2_ID));
 
-    Control_Unit control(.opcode(op), .funct(funct_ID), .RegWrite(RegWrite_ID), .MemtoReg(MemtoReg_ID),
+    Control_Unit control(.clk(clk), .rst(rst), .opcode(op), .funct(funct_ID), .RegWrite(RegWrite_ID), .MemtoReg(MemtoReg_ID),
                         .Shift(Shift_ID), .Mf(Mf_ID), .Branch(Branch_ID), .MemWrite(MemWrite_ID),
                         .MemRead(MemRead_ID), .Jump(Jump_ID), .ALUSrc(ALUSrc_ID), .HiorLo(HiorLo),
                         .RegDst(RegDst_ID), .ALUOp(ALUOp_ID));
@@ -105,7 +106,7 @@ module PipelineMIPS(clk, rst);
 // EX
     add32 BranchADD(.a(pc_incr_EX), .b(extend_immed << 2), .result(b_address_EX));
 
-    ALUControl aluctrl(.clk(clk), .funct(funct), .SignaltoALU(SignaltoALU), .SignaltoMUL(SignaltoMUL), 
+    ALUControl aluctrl(.clk(clk), .rst(rst), .funct(funct), .SignaltoALU(SignaltoALU), .SignaltoMUL(SignaltoMUL), 
                         .Maddu(Maddu), .HiLoWrite(HiLoWrite_EX));
 
     Shifter shifter(.a(RD2_EX), .shamt(shamt), .result(ShifterOut_EX));
@@ -123,6 +124,9 @@ module PipelineMIPS(clk, rst);
     Mux2_64bit MadduMUX(.sel(Maddu), .in0(MULOut), .in1(MadduOut), .out(DataForHiLo_EX));
 
 // EX/MEM pipeline reg
+
+    assign j_address_EX = {pc[31:28], j_offset << 2};
+
     EXMEMreg exmem(.clk(clk), .rst(rst), .RegWrite_IN(RegWrite_EX), .MemtoReg_IN(MemtoReg_EX), .Shift_IN(Shift_EX),
                 .Mf_IN(Mf_EX), .HiLoWrite_IN(HiLoWrite_EX), .Branch_IN(Branch_EX), .MemWrite_IN(MemWrite_EX),
                 .MemRead_IN(MemRead_EX), .Jump_IN(Jump_EX), .JumpAddress_IN(j_address_EX), 
@@ -147,9 +151,9 @@ module PipelineMIPS(clk, rst);
 // MEM/WB pipeline reg
     MEMWBreg memwb(.clk(clk), .rst(rst), .RegWrite_IN(RegWrite_MEM), .MemtoReg_IN(MemtoReg_MEM), .Shift_IN(Shift_MEM), .Mf_IN(Mf_MEM),
                     .HiLoWrite_IN(HiLoWrite_MEM), .ShifterData_IN(ShifterOut_MEM), .MemData_IN(MemOut_MEM), .ALUData_IN(ALUOut_MEM),
-                    .DataForHiLo_IN(DataForHiLo_MEM), .HiLoData_IN(HiLoData_MEM), .WN_IN(WN_MEM), .RegWrite_OUT(RegWrite_MEM),
+                    .DataForHiLo_IN(DataForHiLo_MEM), .HiLoData_IN(HiLoData_MEM), .WN_IN(WN_MEM), .RegWrite_OUT(RegWrite),
                     .MemtoReg_OUT(MemtoReg), .Shift_OUT(Shift), .Mf_OUT(Mf), .HiLoWrite_OUT(HiLoWrite), .ShifterData_OUT(ShifterOut),
-                    .MemData_OUT(MemOut), .ALUData_OUT(ALUOut), .DataForHiLo_OUT(DataForHilo), .HiLoData_OUT(HiLoData), .WN_OUT(WN));
+                    .MemData_OUT(MemOut), .ALUData_OUT(ALUOut), .DataForHiLo_OUT(DataForHiLo), .HiLoData_OUT(HiLoData), .WN_OUT(WN));
 
 // WB
     Mux2_32bit MemMUX(.sel(MemtoReg), .in0(ALUOut), .in1(MemOut), .out(WD1));

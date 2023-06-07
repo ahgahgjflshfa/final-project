@@ -48,7 +48,7 @@ module IDEXreg(clk, rst,
                 ALUSrc_OUT, RegDst_OUT;
 
     always @(posedge clk or rst) begin
-        if (rst) begin
+        if (rst == 1) begin
             ALUOp_OUT <= 0;
             RegWrite_OUT <= 0;
             MemtoReg_OUT <= 0;

@@ -5,7 +5,7 @@ module IFIDreg(clk, rst, PCincre_IN, instr_IN, PCincre_OUT, instr_OUT);
     output reg [31:0] PCincre_OUT, instr_OUT;
 
     always @(posedge clk or rst) begin
-        if (rst) begin
+        if (rst == 1) begin
             PCincre_OUT <= 32'b0;
             instr_OUT <= 32'b0;
         end

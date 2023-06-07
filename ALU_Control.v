@@ -40,8 +40,8 @@
 */
 
 `timescale 1ns/1ns
-module ALUControl( clk, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite );
-    input clk ;
+module ALUControl( clk, rst, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite );
+    input clk, rst ;
     input wire [5:0] funct ;
     output wire [5:0] SignaltoMUL;
     output wire [5:0] SignaltoALU;
@@ -72,8 +72,14 @@ module ALUControl( clk, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite );
     parameter ALU_or  = 3'b001;
     parameter ALU_slt = 3'b111;
 
-    always @( posedge clk ) begin
+    always @( posedge clk or rst ) begin
         temp = funct ;
+
+        if (rst == 1) begin
+            Maddu = 1'b0;
+            HiLoWrite = 1'b0;
+            counter = 1'b0;
+        end
 
         if ( funct == MULTU ) begin
             counter = counter + 1 ;
@@ -95,8 +101,11 @@ module ALUControl( clk, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite );
                 counter = 0;
             end
         end
-        else
+        else begin
+            Maddu = 1'b0;
+            HiLoWrite = 1'b0;
             counter = 0 ;
+        end
     end
 
     assign SignaltoALU = temp ;

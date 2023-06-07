@@ -29,7 +29,7 @@ module MEMWBreg(clk, rst,
     output reg Mf_OUT, Shift_OUT, MemtoReg_OUT, RegWrite_OUT, HiLoWrite_OUT;
 
     always @(posedge clk or rst) begin
-        if (rst) begin
+        if (rst == 1) begin
             ShifterData_OUT <= 0;
             MemData_OUT <= 0;
             ALUData_OUT <= 0;
