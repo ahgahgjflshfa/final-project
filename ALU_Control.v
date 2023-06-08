@@ -47,9 +47,8 @@ module ALUControl( clk, rst, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite )
     output wire [5:0] SignaltoALU;
     output reg Maddu, HiLoWrite;
 
-    reg [5:0] temp ;
+    reg [5:0] temp, pre ;
     reg [6:0] counter ;
-
 
     parameter AND = 6'b100100;
     parameter OR  = 6'b100101;
@@ -81,7 +80,8 @@ module ALUControl( clk, rst, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite )
             counter = 1'b0;
         end
 
-        if ( funct == MULTU ) begin
+        if ( funct == MULTU || pre == MULTU ) begin
+            pre = MULTU;
             counter = counter + 1 ;
 
             if ( counter == 32 ) begin
@@ -89,9 +89,11 @@ module ALUControl( clk, rst, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite )
                 Maddu = 1'b0;
                 temp = 6'b111111 ;
                 counter = 0 ;
+                pre = funct;
             end
         end
-        else if ( funct == MADDU) begin
+        else if ( funct == MADDU || pre == MADDU ) begin
+            pre = MADDU;
             counter = counter + 1;
 
             if (counter == 32) begin
@@ -99,6 +101,7 @@ module ALUControl( clk, rst, funct, SignaltoALU, SignaltoMUL, Maddu, HiLoWrite )
                 Maddu = 1'b1;
                 temp = 6'b111111;
                 counter = 0;
+                pre = funct;
             end
         end
         else begin

@@ -110,7 +110,7 @@ module PipelineMIPS(clk, rst);
 
     Shifter shifter(.a(RD2_EX), .shamt(shamt), .result(ShifterOut_EX));
 
-    Multiplier mul(.clk(clk), .Signal(SignaltoMUL), .dataA(RD1), .dataB(RD2_EX), .dataOut(MULOut));
+    Multiplier mul(.clk(clk), .rst(rst), .Signal(SignaltoMUL), .dataA(RD1), .dataB(RD2_EX), .dataOut(MULOut));
 
     Mux2_32bit alusrcMUX(.sel(ALUSrc), .in0(RD2_EX), .in1(extend_immed), .out(ALU_Input2));
 
